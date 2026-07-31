@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=NM DNS Off
+Comment=Restore DHCP DNS via NetworkManager
+Exec=__HOME__/.local/bin/nm_dns_toggle.sh off
+Icon=network-wired-symbolic
+Terminal=false
+Type=Application
+Categories=Network;Utility;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=NM DNS On
+Comment=Apply custom DNS resolvers via NetworkManager
+Exec=__HOME__/.local/bin/nm_dns_toggle.sh on
+Icon=network-transmit-receive-symbolic
+Terminal=false
+Type=Application
+Categories=Network;Utility;
