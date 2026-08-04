@@ -6,13 +6,14 @@
 
 Скрипт не поднимает свой сервис. Он один раз за запуск:
 
-1. Находит активный connection profile в NetworkManager (интерфейс `lo` пропускается).
-2. В режиме `on` записывает список IP в `ipv4.dns` и запрещает подмешивание DNS от DHCP (`ipv4.ignore-auto-dns yes`).
-3. В режиме `off` очищает `ipv4.dns` и снова разрешает auto-dns.
-4. Вызывает `nmcli connection up`, чтобы настройки применились сразу.
-5. При наличии `notify-send` показывает короткое уведомление о результате.
+1. Читает `CUSTOM_DNS` из `~/.config/nm-dns-toggle/config` (если файла нет — встроенный дефолт в скрипте).
+2. Находит активный connection profile в NetworkManager (интерфейс `lo` пропускается).
+3. В режиме `on` записывает список IP в `ipv4.dns` и запрещает подмешивание DNS от DHCP (`ipv4.ignore-auto-dns yes`).
+4. В режиме `off` очищает `ipv4.dns` и снова разрешает auto-dns.
+5. Вызывает `nmcli connection up`, чтобы настройки применились сразу.
+6. При наличии `notify-send` показывает короткое уведомление о результате.
 
-Имя профиля хранится во внутренней переменной `ACTIVE_CONN`, список резолверов — в `CUSTOM_DNS`.
+Имя профиля хранится во внутренней переменной `ACTIVE_CONN`, список резолверов — в `CUSTOM_DNS` (из конфига или дефолта).
 
 ## Режимы
 
@@ -21,6 +22,8 @@
 ~/.local/bin/nm_dns_toggle.sh off
 ~/.local/bin/nm_dns_toggle.sh status
 ~/.local/bin/nm_dns_toggle.sh status -v
+~/.local/bin/nm_dns_toggle.sh set 1.1.1.1 9.9.9.9
+~/.local/bin/nm_dns_toggle.sh set --apply 1.1.1.1 9.9.9.9
 ```
 
 Эквивалент через алиасы после `install.sh`:
@@ -30,8 +33,11 @@ dnson
 dnsoff
 dnsst
 dnsst -v
+dnsset 1.1.1.1 9.9.9.9
+dnsset --apply 1.1.1.1 9.9.9.9
 ```
 
+`dnsset` только пишет `CUSTOM_DNS` в `~/.config/nm-dns-toggle/config`. Чтобы применить на сеть — `dnson` или сразу `dnsset --apply …`.
 ## Как убедиться, что DNS сменился
 
 Быстрая проверка через сам тул:
@@ -89,7 +95,8 @@ nmcli connection show --active
 
 ## Снятие установки
 
-1. Удалите из `~/.bashrc` строки с `# nm-dns-toggle`, `dnson`, `dnsoff` и `dnsst`.
+1. Удалите из `~/.bashrc` строки с `# nm-dns-toggle`, `dnson`, `dnsoff`, `dnsst` и `dnsset`.
 2. Удалите `~/.local/bin/nm_dns_toggle.sh`.
 3. Удалите `~/.local/share/applications/nm-dns-on.desktop` и `nm-dns-off.desktop`.
-4. При необходимости верните DHCP: `dnsoff` (до удаления скрипта) или руками через `nmcli`.
+4. По желанию удалите конфиг: `rm -rf ~/.config/nm-dns-toggle`.
+5. При необходимости верните DHCP: `dnsoff` (до удаления скрипта) или руками через `nmcli`.

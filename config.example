@@ -1,0 +1,3 @@
+# Copy to ~/.config/nm-dns-toggle/config (install.sh does this on first install)
+# Space-separated IPv4 resolvers used by dnson
+CUSTOM_DNS="8.8.8.8 8.8.4.4"
