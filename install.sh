@@ -18,15 +18,22 @@ sed "s|__HOME__|${HOME}|g" "${ROOT}/nm-dns-off.desktop" \
 update-desktop-database "${APP_DIR}" 2>/dev/null || true
 
 BASHRC="${HOME}/.bashrc"
-if [[ -f "${BASHRC}" ]] && ! grep -q "alias dnson=" "${BASHRC}" 2>/dev/null; then
-  {
-    echo ""
-    echo "# nm-dns-toggle"
-    echo "alias dnson='${SCRIPT_DST} on'"
-    echo "alias dnsoff='${SCRIPT_DST} off'"
-  } >> "${BASHRC}"
+if [[ -f "${BASHRC}" ]]; then
+  if ! grep -q "alias dnson=" "${BASHRC}" 2>/dev/null; then
+    {
+      echo ""
+      echo "# nm-dns-toggle"
+      echo "alias dnson='${SCRIPT_DST} on'"
+      echo "alias dnsoff='${SCRIPT_DST} off'"
+      echo "alias dnsst='${SCRIPT_DST} status'"
+    } >> "${BASHRC}"
+  elif ! grep -q "alias dnsst=" "${BASHRC}" 2>/dev/null; then
+    {
+      echo "alias dnsst='${SCRIPT_DST} status'"
+    } >> "${BASHRC}"
+  fi
 fi
 
 echo "nm-dns-toggle: done."
 echo "Run: source ~/.bashrc"
-echo "Then: dnson  |  dnsoff"
+echo "Then: dnson  |  dnsoff  |  dnsst"

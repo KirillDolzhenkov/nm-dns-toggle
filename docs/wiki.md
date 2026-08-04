@@ -19,6 +19,8 @@
 ```bash
 ~/.local/bin/nm_dns_toggle.sh on
 ~/.local/bin/nm_dns_toggle.sh off
+~/.local/bin/nm_dns_toggle.sh status
+~/.local/bin/nm_dns_toggle.sh status -v
 ```
 
 Эквивалент через алиасы после `install.sh`:
@@ -26,9 +28,33 @@
 ```bash
 dnson
 dnsoff
+dnsst
+dnsst -v
 ```
 
 ## Как убедиться, что DNS сменился
+
+Быстрая проверка через сам тул:
+
+```bash
+dnsst
+```
+
+Пример вывода (OFF):
+
+```text
+Custom DNS: OFF
+Network: Iva Lab
+DNS in use: 192.168.1.1 (router / DHCP)
+
+Tip: run  dnson  to enable your custom DNS
+```
+
+Для отладки добавьте `-v` — после человекочитаемого блока появятся технические поля (`custom`, `configured`, `ignore-auto-dns`, `effective`).
+
+Exit code `0`, если custom DNS активен (профиль совпадает с `CUSTOM_DNS` и `ignore-auto-dns=yes`), иначе `1`.
+
+Глубже — напрямую через NetworkManager:
 
 ```bash
 nmcli -f GENERAL.CONNECTION,IP4.DNS device show
@@ -63,7 +89,7 @@ nmcli connection show --active
 
 ## Снятие установки
 
-1. Удалите из `~/.bashrc` строки с `# nm-dns-toggle`, `dnson` и `dnsoff`.
+1. Удалите из `~/.bashrc` строки с `# nm-dns-toggle`, `dnson`, `dnsoff` и `dnsst`.
 2. Удалите `~/.local/bin/nm_dns_toggle.sh`.
 3. Удалите `~/.local/share/applications/nm-dns-on.desktop` и `nm-dns-off.desktop`.
 4. При необходимости верните DHCP: `dnsoff` (до удаления скрипта) или руками через `nmcli`.
