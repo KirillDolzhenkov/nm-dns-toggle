@@ -1,3 +1,6 @@
 # Copy to ~/.config/nm-dns-toggle/config (install.sh does this on first install)
-# Space-separated IPv4 resolvers used by dnson
-CUSTOM_DNS="8.8.8.8 8.8.4.4"
+#
+# IPv4 is required. IPv6 is optional: if CUSTOM_DNS_IPV6 is empty,
+# `dnson` disables IPv6 on the profile to prevent DNS leaks via the router.
+CUSTOM_DNS_IPV4="8.8.8.8 8.8.4.4"
+CUSTOM_DNS_IPV6="2001:4860:4860::8888 2001:4860:4860::8844"

@@ -16,7 +16,7 @@ install -m 755 "${ROOT}/nm_dns_toggle.sh" "${SCRIPT_DST}"
 if [[ ! -f "${CFG_FILE}" ]]; then
   install -m 644 "${ROOT}/config.example" "${CFG_FILE}"
   echo "nm-dns-toggle: created ${CFG_FILE}"
-  echo "  Edit CUSTOM_DNS there, or run: dnsset 1.1.1.1 9.9.9.9"
+  echo "  Edit CUSTOM_DNS_IPV4 / CUSTOM_DNS_IPV6, or run: dnsset 8.8.8.8 8.8.4.4 …"
 else
   echo "nm-dns-toggle: keeping existing ${CFG_FILE}"
 fi

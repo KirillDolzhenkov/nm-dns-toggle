@@ -6,14 +6,17 @@
 
 Скрипт не поднимает свой сервис. Он один раз за запуск:
 
-1. Читает `CUSTOM_DNS` из `~/.config/nm-dns-toggle/config` (если файла нет — встроенный дефолт в скрипте).
+1. Читает `CUSTOM_DNS_IPV4` / `CUSTOM_DNS_IPV6` из `~/.config/nm-dns-toggle/config` (если файла нет — встроенные дефолты Google).
 2. Находит активный connection profile в NetworkManager (интерфейс `lo` пропускается).
-3. В режиме `on` записывает список IP в `ipv4.dns` и запрещает подмешивание DNS от DHCP (`ipv4.ignore-auto-dns yes`).
-4. В режиме `off` очищает `ipv4.dns` и снова разрешает auto-dns.
+3. В режиме `on`:
+   - IPv4: `ipv4.dns` + `ipv4.ignore-auto-dns yes` (без подмешивания DHCP).
+   - IPv6 задан: `ipv6.dns` + `ipv6.ignore-auto-dns yes`.
+   - IPv6 пуст: `ipv6.method disabled` (закрытие утечки на DNS роутера по v6).
+4. В режиме `off`: очищает DNS обоих стеков, `ignore-auto-dns no`, `ipv6.method auto`.
 5. Вызывает `nmcli connection up`, чтобы настройки применились сразу.
 6. При наличии `notify-send` показывает короткое уведомление о результате.
 
-Имя профиля хранится во внутренней переменной `ACTIVE_CONN`, список резолверов — в `CUSTOM_DNS` (из конфига или дефолта).
+IPv4 обязателен. IPv6 опционален.
 
 ## Режимы
 
@@ -22,8 +25,8 @@
 ~/.local/bin/nm_dns_toggle.sh off
 ~/.local/bin/nm_dns_toggle.sh status
 ~/.local/bin/nm_dns_toggle.sh status -v
-~/.local/bin/nm_dns_toggle.sh set 1.1.1.1 9.9.9.9
-~/.local/bin/nm_dns_toggle.sh set --apply 1.1.1.1 9.9.9.9
+~/.local/bin/nm_dns_toggle.sh set 8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
+~/.local/bin/nm_dns_toggle.sh set --apply 8.8.8.8 8.8.4.4
 ```
 
 Эквивалент через алиасы после `install.sh`:
@@ -33,47 +36,21 @@ dnson
 dnsoff
 dnsst
 dnsst -v
-dnsset 1.1.1.1 9.9.9.9
-dnsset --apply 1.1.1.1 9.9.9.9
+dnsset 8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
+dnsset --apply …
 ```
 
-`dnsset` только пишет `CUSTOM_DNS` в `~/.config/nm-dns-toggle/config`. Чтобы применить на сеть — `dnson` или сразу `dnsset --apply …`.
-## Как убедиться, что DNS сменился
+`dnsset` пишет оба ключа в конфиг (адреса сам раскладывает на IPv4/IPv6). Без IPv6 в аргументах `CUSTOM_DNS_IPV6` будет пустым — при `dnson` IPv6 на профиле отключится.
 
-Быстрая проверка через сам тул:
+## Как убедиться, что DNS сменился
 
 ```bash
 dnsst
-```
-
-Пример вывода (OFF):
-
-```text
-Custom DNS: OFF
-Network: Iva Lab
-DNS in use: 192.168.1.1 (router / DHCP)
-
-Tip: run  dnson  to enable your custom DNS
-```
-
-Для отладки добавьте `-v` — после человекочитаемого блока появятся технические поля (`custom`, `configured`, `ignore-auto-dns`, `effective`).
-
-Exit code `0`, если custom DNS активен (профиль совпадает с `CUSTOM_DNS` и `ignore-auto-dns=yes`), иначе `1`.
-
-Глубже — напрямую через NetworkManager:
-
-```bash
-nmcli -f GENERAL.CONNECTION,IP4.DNS device show
-```
-
-Альтернатива на системах с systemd-resolved:
-
-```bash
+dnsst -v
 resolvectl dns
-resolvectl status
 ```
 
-В выводе после `dnson` должны быть адреса из `CUSTOM_DNS`. После `dnsoff` обычно снова видны адреса роутера/провайдера.
+После `dnson` в `resolvectl dns` не должно быть DNS роутера (`192.168.x.x` / `fe80::…`), если заданы оба стека. Exit code `dnsst` — `0`, если custom DNS активен по политике IPv4+IPv6.
 
 ## Частые проблемы
 
@@ -89,6 +66,9 @@ nmcli connection show --active
 
 **Старые desktop-ярлыки**  
 Переустановите: `./install.sh`. Файлы лежат в `~/.local/share/applications/nm-dns-*.desktop`.
+
+**Утечка IPv6 (сервис то работает, то нет)**  
+Задайте IPv6 DNS в конфиге или оставьте `CUSTOM_DNS_IPV6` пустым — тогда `dnson` отключит IPv6 на профиле.
 
 **Нужен другой профиль, не «первый активный»**  
 Сейчас берётся первый non-loopback active connection. Если одновременно активны VPN и Wi‑Fi, убедитесь, что нужный профиль идёт первым в `nmcli connection show --active`, либо временно отключите лишний.
