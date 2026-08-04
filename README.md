@@ -11,9 +11,9 @@
 ## Быстрый старт
 
 ```bash
-cd ~/Sites/nm-dns-toggle
-chmod +x install.sh nm_dns_toggle.sh
-./install.sh
+git clone https://github.com/KirillDolzhenkov/nm-dns-toggle.git
+cd nm-dns-toggle
+chmod +x install.sh && ./install.sh
 source ~/.bashrc
 ```
 
