@@ -75,8 +75,10 @@ nmcli connection show --active
 
 ## Снятие установки
 
-1. Удалите из `~/.bashrc` строки с `# nm-dns-toggle`, `dnson`, `dnsoff`, `dnsst` и `dnsset`.
-2. Удалите `~/.local/bin/nm_dns_toggle.sh`.
-3. Удалите `~/.local/share/applications/nm-dns-on.desktop` и `nm-dns-off.desktop`.
-4. По желанию удалите конфиг: `rm -rf ~/.config/nm-dns-toggle`.
-5. При необходимости верните DHCP: `dnsoff` (до удаления скрипта) или руками через `nmcli`.
+```bash
+./uninstall.sh          # убрать утилиту; конфиг оставить
+./uninstall.sh --purge  # убрать всё, включая ~/.config/nm-dns-toggle
+source ~/.bashrc
+```
+
+Скрипт сам вызывает `off` (вернуть DHCP / auto DNS), затем удаляет алиасы из `~/.bashrc`, бинарь и desktop-файлы. Каталог проекта (git-клон) не трогается.
