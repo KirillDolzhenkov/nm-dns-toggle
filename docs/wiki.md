@@ -1,8 +1,12 @@
 # Wiki: nm-dns-toggle
 
+**Lang:** [RU](#ru) · [EN](#en)
+
+## RU
+
 Справка по внутреннему устройству и повседневной эксплуатации.
 
-## Архитектура
+### Архитектура
 
 Скрипт не поднимает свой сервис. Он один раз за запуск:
 
@@ -18,7 +22,7 @@
 
 IPv4 обязателен. IPv6 опционален.
 
-## Режимы
+### Режимы
 
 ```bash
 ~/.local/bin/nm_dns_toggle.sh on
@@ -42,7 +46,7 @@ dnsset --apply …
 
 `dnsset` пишет оба ключа в конфиг (адреса сам раскладывает на IPv4/IPv6). Без IPv6 в аргументах `CUSTOM_DNS_IPV6` будет пустым — при `dnson` IPv6 на профиле отключится.
 
-## Как убедиться, что DNS сменился
+### Как убедиться, что DNS сменился
 
 ```bash
 dnsst
@@ -52,7 +56,7 @@ resolvectl dns
 
 После `dnson` в `resolvectl dns` не должно быть DNS роутера (`192.168.x.x` / `fe80::…`), если заданы оба стека. Exit code `dnsst` — `0`, если custom DNS активен по политике IPv4+IPv6.
 
-## Частые проблемы
+### Частые проблемы
 
 **«no active NetworkManager profile»**  
 Нет поднятого Wi‑Fi/Ethernet под NM. Проверьте:
@@ -73,7 +77,7 @@ nmcli connection show --active
 **Нужен другой профиль, не «первый активный»**  
 Сейчас берётся первый non-loopback active connection. Если одновременно активны VPN и Wi‑Fi, убедитесь, что нужный профиль идёт первым в `nmcli connection show --active`, либо временно отключите лишний.
 
-## Удаление
+### Удаление
 
 ```bash
 ./uninstall.sh          # убрать утилиту; конфиг оставить
@@ -82,3 +86,88 @@ source ~/.bashrc
 ```
 
 Скрипт сам вызывает `off` (вернуть DHCP / auto DNS), затем удаляет алиасы из `~/.bashrc`, бинарь и desktop-файлы. Каталог проекта (git-клон) не трогается.
+
+## EN
+
+Reference for internals and day-to-day use.
+
+### Architecture
+
+The script does not run its own service. On each invocation it:
+
+1. Reads `CUSTOM_DNS_IPV4` / `CUSTOM_DNS_IPV6` from `~/.config/nm-dns-toggle/config` (if the file is missing — built-in Google defaults).
+2. Finds the active NetworkManager connection profile (skips the `lo` interface).
+3. In `on` mode:
+   - IPv4: `ipv4.dns` + `ipv4.ignore-auto-dns yes` (no DHCP mixing).
+   - IPv6 set: `ipv6.dns` + `ipv6.ignore-auto-dns yes`.
+   - IPv6 empty: `ipv6.method disabled` (closes the leak to the router DNS over v6).
+4. In `off` mode: clears DNS on both stacks, `ignore-auto-dns no`, `ipv6.method auto`.
+5. Calls `nmcli connection up` so settings apply immediately.
+6. If `notify-send` is available, shows a short result notification.
+
+IPv4 is required. IPv6 is optional.
+
+### Modes
+
+```bash
+~/.local/bin/nm_dns_toggle.sh on
+~/.local/bin/nm_dns_toggle.sh off
+~/.local/bin/nm_dns_toggle.sh status
+~/.local/bin/nm_dns_toggle.sh status -v
+~/.local/bin/nm_dns_toggle.sh set 8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
+~/.local/bin/nm_dns_toggle.sh set --apply 8.8.8.8 8.8.4.4
+```
+
+Equivalent aliases after `install.sh`:
+
+```bash
+dnson
+dnsoff
+dnsst
+dnsst -v
+dnsset 8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
+dnsset --apply …
+```
+
+`dnsset` writes both keys to the config (it splits addresses into IPv4/IPv6 itself). With no IPv6 in the arguments, `CUSTOM_DNS_IPV6` is empty — on `dnson`, IPv6 on the profile will be disabled.
+
+### How to verify DNS changed
+
+```bash
+dnsst
+dnsst -v
+resolvectl dns
+```
+
+After `dnson`, `resolvectl dns` should not show the router DNS (`192.168.x.x` / `fe80::…`) if both stacks are configured. Exit code of `dnsst` is `0` when custom DNS is active per the IPv4+IPv6 policy.
+
+### Common issues
+
+**«no active NetworkManager profile»**  
+No Wi‑Fi/Ethernet connection is up under NM. Check:
+
+```bash
+nmcli connection show --active
+```
+
+**Aliases not found**  
+Open a new terminal or run `source ~/.bashrc`. Make sure the file contains the `# nm-dns-toggle` block.
+
+**Stale desktop shortcuts**  
+Reinstall: `./install.sh`. Files live in `~/.local/share/applications/nm-dns-*.desktop`.
+
+**IPv6 leak (service works intermittently)**  
+Set IPv6 DNS in the config, or leave `CUSTOM_DNS_IPV6` empty — then `dnson` disables IPv6 on the profile.
+
+**Need a different profile, not the «first active» one**  
+Currently the first non-loopback active connection is used. If VPN and Wi‑Fi are active at the same time, ensure the desired profile is first in `nmcli connection show --active`, or temporarily disconnect the extra one.
+
+### Uninstall
+
+```bash
+./uninstall.sh          # remove the utility; keep config
+./uninstall.sh --purge  # remove everything, including ~/.config/nm-dns-toggle
+source ~/.bashrc
+```
+
+The script itself runs `off` (restore DHCP / auto DNS), then removes aliases from `~/.bashrc`, the binary, and desktop files. The project directory (git clone) is left untouched.
