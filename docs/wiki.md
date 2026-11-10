@@ -33,7 +33,7 @@ IPv4 обязателен. IPv6 опционален.
 ~/.local/bin/nm_dns_toggle.sh set --apply 8.8.8.8 8.8.4.4
 ```
 
-Эквивалент через алиасы после `install.sh`:
+Эквивалент через алиасы после `install.sh` (по умолчанию в `~/.bashrc` и `~/.zshrc`, если файлы есть; иначе `./install.sh --shell bash|zsh`):
 
 ```bash
 dnson
@@ -66,7 +66,7 @@ nmcli connection show --active
 ```
 
 **Алиасы не находятся**  
-Новый терминал или `source ~/.bashrc`. Убедитесь, что в файле есть блок `# nm-dns-toggle`.
+Новый терминал или `source ~/.bashrc` / `source ~/.zshrc`. Убедитесь, что в rc вашего shell есть блок `# nm-dns-toggle`.
 
 **Старые desktop-ярлыки**  
 Переустановите: `./install.sh`. Файлы лежат в `~/.local/share/applications/nm-dns-*.desktop`.
@@ -82,10 +82,10 @@ nmcli connection show --active
 ```bash
 ./uninstall.sh          # убрать утилиту; конфиг оставить
 ./uninstall.sh --purge  # убрать всё, включая ~/.config/nm-dns-toggle
-source ~/.bashrc
+source ~/.bashrc   # или: source ~/.zshrc
 ```
 
-Скрипт сам вызывает `off` (вернуть DHCP / auto DNS), затем удаляет алиасы из `~/.bashrc`, бинарь и desktop-файлы. Каталог проекта (git-клон) не трогается.
+Скрипт сам вызывает `off` (вернуть DHCP / auto DNS), затем удаляет алиасы из `~/.bashrc` и `~/.zshrc`, бинарь и desktop-файлы. Каталог проекта (git-клон) не трогается.
 
 ## EN
 
@@ -118,7 +118,7 @@ IPv4 is required. IPv6 is optional.
 ~/.local/bin/nm_dns_toggle.sh set --apply 8.8.8.8 8.8.4.4
 ```
 
-Equivalent aliases after `install.sh`:
+Equivalent aliases after `install.sh` (by default into `~/.bashrc` and `~/.zshrc` if present; otherwise `./install.sh --shell bash|zsh`):
 
 ```bash
 dnson
@@ -151,7 +151,7 @@ nmcli connection show --active
 ```
 
 **Aliases not found**  
-Open a new terminal or run `source ~/.bashrc`. Make sure the file contains the `# nm-dns-toggle` block.
+Open a new terminal or run `source ~/.bashrc` / `source ~/.zshrc`. Make sure your shell rc contains the `# nm-dns-toggle` block.
 
 **Stale desktop shortcuts**  
 Reinstall: `./install.sh`. Files live in `~/.local/share/applications/nm-dns-*.desktop`.
@@ -167,7 +167,7 @@ Currently the first non-loopback active connection is used. If VPN and Wi‑Fi a
 ```bash
 ./uninstall.sh          # remove the utility; keep config
 ./uninstall.sh --purge  # remove everything, including ~/.config/nm-dns-toggle
-source ~/.bashrc
+source ~/.bashrc   # or: source ~/.zshrc
 ```
 
-The script itself runs `off` (restore DHCP / auto DNS), then removes aliases from `~/.bashrc`, the binary, and desktop files. The project directory (git clone) is left untouched.
+The script itself runs `off` (restore DHCP / auto DNS), then removes aliases from `~/.bashrc` and `~/.zshrc`, the binary, and desktop files. The project directory (git clone) is left untouched.

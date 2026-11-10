@@ -9,7 +9,7 @@
 ### Требования
 
 - Linux с NetworkManager (`nmcli` в PATH)
-- интерактивный Bash (`~/.bashrc`)
+- интерактивный Bash или zsh (`~/.bashrc` / `~/.zshrc`)
 - по желанию: `notify-send` для всплывающих уведомлений
 
 ### Быстрый старт
@@ -18,7 +18,14 @@
 git clone https://github.com/KirillDolzhenkov/nm-dns-toggle.git
 cd nm-dns-toggle
 chmod +x install.sh && ./install.sh
-source ~/.bashrc
+source ~/.bashrc   # или: source ~/.zshrc
+```
+
+По умолчанию алиасы пишутся в оба rc-файла, если они существуют. Только один shell:
+
+```bash
+./install.sh --shell bash
+./install.sh --shell zsh
 ```
 
 После установки бинарь лежит в `~/.local/bin/nm_dns_toggle.sh`, а в shell появляются короткие команды:
@@ -74,10 +81,10 @@ CUSTOM_DNS_IPV6="2001:4860:4860::8888 2001:4860:4860::8844"
 chmod +x uninstall.sh
 ./uninstall.sh          # убрать утилиту; конфиг оставить
 ./uninstall.sh --purge  # то же + удалить ~/.config/nm-dns-toggle
-source ~/.bashrc
+source ~/.bashrc   # или: source ~/.zshrc
 ```
 
-Сначала вызывается `off` (возврат DHCP), затем удаляются алиасы, бинарь и desktop-ярлыки.
+Сначала вызывается `off` (возврат DHCP), затем удаляются алиасы из `~/.bashrc` и `~/.zshrc`, бинарь и desktop-ярлыки.
 
 ### Дальше по теме
 
@@ -90,7 +97,7 @@ A Bash utility that changes DNS on the current Linux network profile via Network
 ### Requirements
 
 - Linux with NetworkManager (`nmcli` in PATH)
-- interactive Bash (`~/.bashrc`)
+- interactive Bash or zsh (`~/.bashrc` / `~/.zshrc`)
 - optional: `notify-send` for desktop notifications
 
 ### Quick start
@@ -99,7 +106,14 @@ A Bash utility that changes DNS on the current Linux network profile via Network
 git clone https://github.com/KirillDolzhenkov/nm-dns-toggle.git
 cd nm-dns-toggle
 chmod +x install.sh && ./install.sh
-source ~/.bashrc
+source ~/.bashrc   # or: source ~/.zshrc
+```
+
+By default aliases are written to both rc files if they exist. One shell only:
+
+```bash
+./install.sh --shell bash
+./install.sh --shell zsh
 ```
 
 After install the binary is at `~/.local/bin/nm_dns_toggle.sh`, and short shell commands become available:
@@ -155,10 +169,10 @@ Defaults: Google Public DNS (IPv4 `8.8.8.8 8.8.4.4`, IPv6 `2001:4860:4860::8888 
 chmod +x uninstall.sh
 ./uninstall.sh          # remove the utility; keep config
 ./uninstall.sh --purge  # same + delete ~/.config/nm-dns-toggle
-source ~/.bashrc
+source ~/.bashrc   # or: source ~/.zshrc
 ```
 
-First it runs `off` (restore DHCP), then removes aliases, the binary, and desktop shortcuts.
+First it runs `off` (restore DHCP), then removes aliases from `~/.bashrc` and `~/.zshrc`, the binary, and desktop shortcuts.
 
 ### Further reading
 
